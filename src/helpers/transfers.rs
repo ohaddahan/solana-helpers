@@ -1,9 +1,17 @@
 use crate::errors::Errors;
 use solana_program::account_info::AccountInfo;
 
+/// Provides utilities for transferring SOL and tokens.
 pub struct Transfers;
 
 impl Transfers {
+    /// Transfers SOL from a PDA account by directly manipulating lamport balances.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Arithmetic overflow occurs during balance calculation
+    /// - Unable to borrow lamports for modification
     pub fn transfer_sol_from_pda(
         from: &mut AccountInfo,
         to: &mut AccountInfo,
@@ -22,6 +30,11 @@ impl Transfers {
         Ok(())
     }
 
+    /// Transfers SOL using the system program transfer instruction.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the program invocation fails
     pub fn transfer_sol<'a>(
         from: AccountInfo<'a>,
         to: AccountInfo<'a>,
@@ -35,6 +48,13 @@ impl Transfers {
         Ok(())
     }
 
+    /// Transfers SPL tokens between token accounts.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Token instruction creation fails
+    /// - Program invocation fails
     pub fn transfer_token<'a>(
         from: AccountInfo<'a>,
         to: AccountInfo<'a>,
@@ -56,6 +76,13 @@ impl Transfers {
         Ok(())
     }
 
+    /// Transfers SPL tokens from a PDA-owned token account.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Token instruction creation fails
+    /// - Program invocation with seeds fails
     pub fn transfer_token_from_pda<'a>(
         from: AccountInfo<'a>,
         to: AccountInfo<'a>,

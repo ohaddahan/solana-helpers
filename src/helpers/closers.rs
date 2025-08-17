@@ -3,9 +3,17 @@ use crate::helpers::transfers::Transfers;
 use solana_program::account_info::AccountInfo;
 use solana_program::program_memory::sol_memset;
 
+/// Provides utilities for closing accounts and transferring lamports.
 pub struct Closers;
 
 impl Closers {
+    /// Closes a PDA account by transferring all lamports to a destination account.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - The transfer of lamports fails
+    /// - Unable to borrow account data for memory clearing
     pub fn close_pda(from: &mut AccountInfo, to: &mut AccountInfo) -> Result<(), Errors> {
         let amount = from.lamports();
         let size = from.try_data_len()?;
@@ -14,10 +22,17 @@ impl Closers {
         Ok(())
     }
 
+    /// Closes a regular account by clearing its data, transferring lamports, and reassigning ownership.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Unable to borrow account data for memory clearing
+    /// - The SOL transfer fails
     pub fn close_account<'a>(
-        from: AccountInfo<'a>,
+        from: &AccountInfo<'a>,
         to: AccountInfo<'a>,
-        system_program: AccountInfo<'a>,
+        system_program: &AccountInfo<'a>,
     ) -> Result<(), Errors> {
         let amount = from.lamports();
         let size = from.try_data_len()?;
@@ -27,6 +42,13 @@ impl Closers {
         Ok(())
     }
 
+    /// Closes a token account using the SPL token program.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Token instruction creation fails
+    /// - Program invocation with seeds fails
     pub fn close_token_account<'a>(
         account: AccountInfo<'a>,
         destination: AccountInfo<'a>,

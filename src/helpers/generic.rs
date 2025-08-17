@@ -7,13 +7,31 @@ use solana_program::pubkey::Pubkey;
 use solana_program::rent::Rent;
 use solana_program::sysvar::Sysvar;
 
+/// Provides generic utility functions for Solana programs.
 pub struct Generic;
 
 impl Generic {
+    /// Checks if a token mint is the native SOL mint.
+    ///
+    /// # Arguments
+    ///
+    /// * `token_mint` - The token mint account to check
+    ///
+    /// # Returns
+    ///
+    /// `true` if the mint is the native SOL mint, `false` otherwise
+    #[must_use]
     pub fn is_native(token_mint: &AccountInfo) -> bool {
         *token_mint.key == spl_token::native_mint::id()
     }
 
+    /// Burns tokens from a token account using program-derived address authority.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Token instruction creation fails
+    /// - Program invocation with seeds fails
     pub fn burn_tokens<'a>(
         token_program: AccountInfo<'a>,
         account: AccountInfo<'a>,
@@ -38,7 +56,14 @@ impl Generic {
         Ok(())
     }
 
+    /// Prints a SOL value in human-readable format to the program log.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name/label for the value
+    /// * `value` - The value in lamports to convert and display
     pub fn print_sol(name: &str, value: u64) {
+        #[allow(clippy::cast_precision_loss)]
         sol_log(&format!(
             "{} = {}",
             name,
@@ -46,10 +71,35 @@ impl Generic {
         ));
     }
 
+    /// Unsafely clones an `AccountInfo` by transmuting its lifetime to 'static.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because it extends the lifetime of the `AccountInfo`
+    /// to `'static`, which may lead to use-after-free if the original data is dropped.
+    ///
+    /// # Arguments
+    ///
+    /// * `input` - The `AccountInfo` to clone
+    ///
+    /// # Returns
+    ///
+    /// A cloned `AccountInfo` with `'static` lifetime
+    #[must_use]
     pub fn unsafe_clone_account_info(input: &AccountInfo<'_>) -> AccountInfo<'static> {
         unsafe { std::mem::transmute::<AccountInfo, AccountInfo>(input.clone()) }
     }
 
+    /// Derives an 8-byte discriminator from a string using SHA256.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The string to derive the discriminator from
+    ///
+    /// # Returns
+    ///
+    /// An 8-byte discriminator array
+    #[must_use]
     pub fn derive_discriminator(name: &str) -> [u8; 8] {
         let mut hasher = Sha256::new();
         hasher.update(name.as_bytes());
@@ -59,7 +109,17 @@ impl Generic {
         discriminator
     }
 
-    #[inline(always)]
+    /// Creates a program-derived address (PDA) account.
+    ///
+    /// Validates that the target account matches the expected PDA derived from the seeds,
+    /// then creates the account with the specified space and assigns it to the program.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - The target account key doesn't match the expected PDA
+    /// - Rent calculation fails
+    /// - Account creation fails
     pub fn create_pda_account<'a, 'info>(
         target_account: &'a AccountInfo<'info>,
         system_program: &'a AccountInfo<'info>,
