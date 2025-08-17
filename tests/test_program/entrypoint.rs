@@ -1,7 +1,7 @@
+use crate::test_program::processor::Processor;
 use solana_program::{
     account_info::AccountInfo, entrypoint, entrypoint::ProgramResult, pubkey::Pubkey,
 };
-use crate::test_program::processor::Processor;
 
 entrypoint!(process_instruction);
 fn process_instruction(

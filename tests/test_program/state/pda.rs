@@ -4,7 +4,7 @@ use solana_program::program_pack::{Pack, Sealed};
 
 pub struct PDA {
     pub bump: u8,
-    pub uuid: String
+    pub uuid: String,
 }
 
 impl PDA {
@@ -21,10 +21,7 @@ impl Pack for PDA {
 
     fn pack_into_slice(&self, dst: &mut [u8]) {
         let dst = array_mut_ref![dst, 0, PDA::LEN];
-        let (
-            bump_dst,
-            uuid_dst,
-        ) = mut_array_refs![dst, 1, 16];
+        let (bump_dst, uuid_dst) = mut_array_refs![dst, 1, 16];
 
         bump_dst[0] = self.bump;
         uuid_dst.copy_from_slice(self.uuid.as_bytes());
@@ -32,10 +29,7 @@ impl Pack for PDA {
 
     fn unpack_from_slice(src: &[u8]) -> Result<Self, ProgramError> {
         let src = array_ref![src, 0, PDA::LEN];
-        let (
-            bump,
-            uuid,
-        ) = array_refs![src, 1, 16];
+        let (bump, uuid) = array_refs![src, 1, 16];
 
         Ok(PDA {
             bump: bump[0],

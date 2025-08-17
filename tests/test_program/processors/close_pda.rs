@@ -1,9 +1,9 @@
+use crate::test_program::state::pda::PDA;
 use solana_program::account_info::{AccountInfo, next_account_info};
 use solana_program::entrypoint::ProgramResult;
 use solana_program::program_pack::Pack;
 use solana_program::pubkey::Pubkey;
 use solana_program::sysvar;
-use crate::test_program::state::pda::PDA;
 
 pub fn close_pda(
     accounts: &[AccountInfo],

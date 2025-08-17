@@ -27,7 +27,7 @@ impl Generic {
             account.key,
             mint.key,
             authority.key,
-            &[&authority.key],
+            &[authority.key],
             amount,
         )?;
         solana_program::program::invoke_signed(
@@ -46,9 +46,7 @@ impl Generic {
         ));
     }
 
-    pub fn unsafe_clone_account_info<'a, 'info>(
-        input: &'a AccountInfo<'info>,
-    ) -> AccountInfo<'static> {
+    pub fn unsafe_clone_account_info(input: &AccountInfo<'_>) -> AccountInfo<'static> {
         unsafe { std::mem::transmute::<AccountInfo, AccountInfo>(input.clone()) }
     }
 

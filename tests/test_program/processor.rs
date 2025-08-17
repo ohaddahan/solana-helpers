@@ -1,9 +1,9 @@
-use solana_program::account_info::{AccountInfo};
-use solana_program::entrypoint::ProgramResult;
-use solana_program::{msg};
-use solana_program::pubkey::Pubkey;
 use crate::test_program::instructions::Instructions;
 use crate::test_program::processors;
+use solana_program::account_info::AccountInfo;
+use solana_program::entrypoint::ProgramResult;
+use solana_program::msg;
+use solana_program::pubkey::Pubkey;
 
 pub struct Processor;
 impl Processor {
