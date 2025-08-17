@@ -1,6 +1,5 @@
 use crate::errors::Errors;
 use solana_program::account_info::AccountInfo;
-use solana_program::program_error::ProgramError;
 
 pub struct Transfers;
 
@@ -18,8 +17,8 @@ impl Transfers {
             .lamports()
             .checked_add(amount)
             .ok_or(Errors::NumericalOverflow)?;
-        **from.try_borrow_mut_lamports().unwrap() = post_from;
-        **to.try_borrow_mut_lamports().unwrap() = post_to;
+        **from.try_borrow_mut_lamports()? = post_from;
+        **to.try_borrow_mut_lamports()? = post_to;
         Ok(())
     }
 
@@ -42,7 +41,7 @@ impl Transfers {
         token_program: AccountInfo<'a>,
         owner: AccountInfo<'a>,
         amount: u64,
-    ) -> Result<(), ProgramError> {
+    ) -> Result<(), Errors> {
         solana_program::program::invoke(
             &spl_token::instruction::transfer(
                 token_program.key,
@@ -64,7 +63,7 @@ impl Transfers {
         owner: AccountInfo<'a>,
         amount: u64,
         seeds: &[&[&[u8]]],
-    ) -> Result<(), ProgramError> {
+    ) -> Result<(), Errors> {
         solana_program::program::invoke_signed(
             &spl_token::instruction::transfer(
                 token_program.key,
