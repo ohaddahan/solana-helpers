@@ -4641,7 +4641,7 @@ dependencies = [
 
 [[package]]
 name = "solana-helpers"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "arrayref",
  "num-bigint 0.4.6",
