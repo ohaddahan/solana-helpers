@@ -1,3 +1,4 @@
+use solana_program::entrypoint::ProgramResult;
 use solana_program::program_error::ProgramError;
 use thiserror::Error;
 
@@ -16,13 +17,18 @@ pub enum Errors {
     /// Indicates a PDA address doesn't match the expected derived address.
     #[error("Wrong Pda Address")]
     WrongPdaAddress,
+    #[error("Can't convert ProgramResult")]
+    CantConvertProgramResult,
 }
 
-// impl From<Errors> for ProgramError {
-//     fn from(e: Errors) -> Self {
-//         ProgramError::Custom(e as u32)
-//     }
-// }
+impl From<ProgramResult> for Errors {
+    fn from(value: ProgramResult) -> Self {
+        match value.err() {
+            Some(err) => Self::from(err),
+            None => Self::CantConvertProgramResult,
+        }
+    }
+}
 
 impl From<ProgramError> for Errors {
     fn from(value: ProgramError) -> Self {

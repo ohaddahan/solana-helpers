@@ -1,4 +1,5 @@
 use crate::test_program::state::pda::PDA;
+use solana_helpers::helpers::closers::Closers;
 use solana_program::account_info::{AccountInfo, next_account_info};
 use solana_program::entrypoint::ProgramResult;
 use solana_program::program_pack::Pack;
@@ -30,6 +31,6 @@ pub fn close_pda(
 
     assert_eq!(pda_account.bump, bump);
     assert_eq!(pda_account.uuid, uuid);
-    solana_helpers::helpers::closers::close_pda(&mut pda.clone(), &mut signer.clone())?;
+    Closers::close_pda(&mut pda.clone(), &mut signer.clone()).unwrap();
     Ok(())
 }
