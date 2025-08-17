@@ -1,18 +1,30 @@
 [package]
 name = "solana-helpers"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
+rust-version = "1.88.0"
+authors = ["ohaddahan@gmail.com"]
+license = "MIT"
+description = "Solana helpers"
+keywords = ["solana"]
+categories = ["cryptography"]
+repository = "https://github.com/ohaddahan/solana-helpers.git"
+documentation = "https://docs.rs/orca-sol/latest/solana-helpers"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-spl-token = "3.3.0"
-spl-associated-token-account = "1.1.1"
-solana-program = "1.14.5"
-thiserror = "1.0.37"
-solana-program-test = "1.14.5"
-solana-sdk = "1.14.5"
-arrayref = "0.3.6"
+spl-token = "8.0.0"
+solana-system-interface = { version = "1.0.0", features = ["bincode"] }
+spl-associated-token-account = "7.0.0"
+solana-program = "2.3.0"
+solana-address = "1.0.0"
+thiserror = "2.0.15"
+solana-program-test = "2.3.7"
+solana-sdk = "2.3.1"
+arrayref = "0.3.9"
+num-bigint = "0.4.6"
+sha2 = "0.10.9"
 
 [features]
 no-entrypoint = []
