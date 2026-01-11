@@ -1,6 +1,7 @@
 use crate::errors::Errors;
 use sha2::{Digest, Sha256};
 use solana_program::account_info::AccountInfo;
+use solana_program::entrypoint::ProgramResult;
 use solana_program::log::sol_log;
 use solana_program::native_token::LAMPORTS_PER_SOL;
 use solana_program::pubkey::Pubkey;
@@ -156,6 +157,61 @@ impl Generic {
             ],
             &[seeds],
         )?;
+        Ok(())
+    }
+
+    #[inline(always)]
+    pub fn create_account_with_minimal_balance<'a, 'info>(
+        account: &'a AccountInfo<'info>,
+        space: usize,
+        owner: &Pubkey,
+        payer: &'a AccountInfo<'info>,
+        system_program: &'a AccountInfo<'info>,
+        signers_seeds: &[&[&[u8]]],
+        rent_sysvar: Option<&'a AccountInfo<'info>>,
+    ) -> ProgramResult {
+        let lamports = if let Some(rent_sysvar) = rent_sysvar {
+            let rent = Rent::from_account_info(rent_sysvar)?;
+            rent.minimum_balance(space)
+        } else {
+            Rent::get()?.minimum_balance(space)
+        };
+
+        if account.lamports() == 0 {
+            let ix = solana_program::system_instruction::create_account(
+                payer.key,
+                account.key,
+                lamports,
+                space as u64,
+                owner,
+            );
+            solana_program::program::invoke_signed(
+                &ix,
+                &[payer.clone(), account.clone(), system_program.clone()],
+                signers_seeds,
+            )?;
+        } else {
+            let required_lamports = lamports.saturating_sub(account.lamports());
+
+            if required_lamports > 0 {
+                let ix =
+                    solana_program::system_instruction::transfer(payer.key, account.key, required_lamports);
+                solana_program::program::invoke(
+                    &ix,
+                    &[payer.clone(), account.clone(), system_program.clone()],
+                )?;
+            }
+
+            let ix = solana_program::system_instruction::assign(account.key, owner);
+            solana_program::program::invoke_signed(
+                &ix,
+                &[account.clone(), system_program.clone()],
+                signers_seeds,
+            )?;
+
+            account.resize(space)?;
+        }
+
         Ok(())
     }
 }
